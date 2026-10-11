@@ -12,4 +12,9 @@ data class Pokemon(
     val order: Int,
     val weight: Int,
     val types: List<PokemonTypeSlot>,
+    val sprites: PokemonSprites
+)
+data class PokemonSprites(
+    @SerializedName("front_default")
+    val frontDefault: String?
 )

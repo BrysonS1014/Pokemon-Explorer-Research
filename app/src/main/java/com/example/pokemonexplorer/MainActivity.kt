@@ -16,6 +16,18 @@ import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.example.pokemonexplorer.network.RetrofitInstance
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.pokemonexplorer.data.Pokemon
+import kotlinx.coroutines.selects.select
+import coil3.compose.AsyncImage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,12 +35,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokemonExplorerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                PokemonSearchScreen()
             }
         }
         lifecycleScope.launch {
@@ -39,17 +46,49 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun PokemonWelcome() {
+    Text("Welcome to Pokémon Explorer!")
 }
-
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    PokemonExplorerTheme {
-        Greeting("Android")
+fun PokemonSearchScreen() {
+    var searchText by remember { mutableStateOf("")}
+    val scope = rememberCoroutineScope()
+    var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
+    Column {
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            label = { Text("Pokémon Name")}
+        )
+        Button(
+            onClick = {
+                println("Button Clicked!")
+                scope.launch {
+                    try {
+                        val pokemon = RetrofitInstance.api.getPokemon(searchText)
+                        Log.d("PokemonExplorer", "Searching for $searchText")
+                        Log.d("PokemonExplorer", "Pokemon: $pokemon")
+                        Log.d("PokemonExplorer", "Sprite URL: ${pokemon.sprites.frontDefault}")
+                        selectedPokemon = pokemon
+                    } catch (e: Exception) {
+                        Log.e("PokemonExplorer", "Request failed", e)
+                    }
+                }
+            }
+        ) {
+            Text("Search")
+        }
+        selectedPokemon?.let { pokemon ->
+            AsyncImage(
+                model = pokemon.sprites.frontDefault,
+                contentDescription = "Sprite of ${pokemon.name}"
+            )
+            Text("Name: ${pokemon.name}")
+            Text("ID: ${pokemon.id}")
+            Text("Height (meters): ${pokemon.height/10.0}")
+            pokemon.types.forEach { pokemonType ->
+                Text("Type: ${pokemonType.type.name}")
+            }
+        }
     }
 }
