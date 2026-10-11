@@ -12,6 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.pokemonexplorer.ui.theme.PokemonExplorerTheme
+import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import com.example.pokemonexplorer.network.RetrofitInstance
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +30,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+        lifecycleScope.launch {
+            val pokemon = RetrofitInstance.api.getPokemon("pikachu")
+            Log.d("PokemonExplorer", "Pokemon: $pokemon")
         }
     }
 }
