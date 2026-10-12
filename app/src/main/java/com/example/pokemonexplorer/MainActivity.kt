@@ -1,5 +1,6 @@
 package com.example.pokemonexplorer
 
+import android.graphics.Paint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,6 +37,7 @@ import coil3.compose.AsyncImage
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,14 +68,18 @@ fun PokemonSearchScreen() {
     ) {
         Text(
             text = "Pokémon Explorer",
-            fontSize = 24.sp
+            fontSize = 26.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
         )
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             label = { Text("Pokémon Name")}
         )
         Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
                 isLoading = true
                 scope.launch {
@@ -95,6 +101,7 @@ fun PokemonSearchScreen() {
                 }
             },
             enabled = !isLoading && searchText.isNotBlank()
+
         ) {
             Text("Search")
         }
@@ -117,11 +124,22 @@ fun PokemonSearchScreen() {
                         contentDescription = "Sprite of ${pokemon.name}",
                         modifier = Modifier.size(256.dp).align(Alignment.CenterHorizontally)
                     )
-                    Text("Name: ${pokemon.name}")
-                    Text("ID: ${pokemon.id}")
-                    Text("Height (meters): ${pokemon.height / 10.0}")
+
+                    Text(
+                        text = "Name: ${pokemon.name}",
+                        fontSize = 22.sp
+                    )
+                    Text(
+                        text = "ID: ${pokemon.id}",
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = "Height (meters): ${pokemon.height / 10.0}",
+                        fontSize = 16.sp)
                     pokemon.types.forEach { pokemonType ->
-                        Text("Type: ${pokemonType.type.name}")
+                        Text(
+                            text = "Type: ${pokemonType.type.name}",
+                            fontSize = 16.sp)
                     }
                 }
             }
